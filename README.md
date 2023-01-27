@@ -3,5 +3,5 @@
 ## copy outlines
 
 ```sh
-python3 copy-outlines.py
+python copy-outlines.py -o outline.pdf -p page.pdf -m merge.pdf
 ```
