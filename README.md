@@ -1,8 +1,7 @@
-# PDF 도구
+# PDF Command Tools
 
 ## copy outlines
 
 ```sh
-python3 main.py
+python3 copy-outlines.py
 ```
-
