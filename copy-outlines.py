@@ -1,41 +1,48 @@
 from pprint import pprint
+from typing import Any
 
 from pypdf import PdfReader, PdfWriter
+from pypdf.types import OutlineType
 
 
-def recursive_copy(parent_node, outlines, reader, writer):
+def flatten(outlines: Any) -> list[OutlineType]:
+    return _flatten_outlines([], outlines)
+
+
+def _flatten_outlines(
+        ls: list,
+        outlines: Any
+) -> list[OutlineType]:
     for i in range(len(outlines)):
         outline_node = outlines[i]
         if isinstance(outline_node, list):
-            recursive_copy(outlines[i - 1], outline_node, reader, writer)
+            _flatten_outlines(ls, outline_node)
         else:
-            # print(type(outline_node))
-            # print(outline_node)
+            ls.append(outline_node)
 
-            # if outline_node["/Count"] != None:
-
-            writer.add_outline_item(
-                title=outline_node["/Title"],
-                page_number=reader.get_destination_page_number(outline_node),
-            )
+    return ls
 
 
-def copy(reader, writer):
-    outlines: list = reader.outline
-    pprint(outlines)
-    recursive_copy(None, outlines, reader, writer)
+# Outline(구 bookmark)을 추출할 PDF
+outline_reader = PdfReader("outline.pdf")
+original_outlines: list = outline_reader.outline
+pprint(original_outlines)
+flattened_outline_list: list = flatten(original_outlines)
 
+# Page를 추출할 PDF
+page_reader = PdfReader("page.pdf")
 
-reader = PdfReader("old.pdf")
-writer = PdfWriter()
+# Page와 Outline을 합칠 최종 PDF
+merge_writer = PdfWriter()
 
-copy(reader, writer)
+for outline in flattened_outline_list:
+    merge_writer.add_outline_item(
+        title=outline["/Title"],
+        page_number=outline_reader.get_destination_page_number(outline),
+    )
 
-for page in reader.pages:
+for page in page_reader.pages:
     # writer.add_outline()
-    writer.add_page(page)
+    merge_writer.add_page(page)
 
-writer.write("new.pdf")
-
-# new_reader = PdfReader("new.pdf")
-# pprint(new_reader.get_bookmarks())
+merge_writer.write("merge.pdf")
