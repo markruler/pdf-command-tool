@@ -59,12 +59,14 @@ if __name__ == "__main__":
     """)
     parser.add_argument('-o', '--outline',
                         metavar='<path>',
-                        required=True,
+                        required=False,
+                        default=r"outline.pdf",
                         type=str,
                         help='Outline(old Bookmark)을 추출할 PDF')
     parser.add_argument('-p', '--page',
                         metavar='<path>',
-                        required=True,
+                        required=False,
+                        default=r"page.pdf",
                         type=str,
                         help='Page를 추출할 PDF')
     parser.add_argument('-m', '--merge',
