@@ -82,7 +82,7 @@ def main(
         # print(txt)
         text.append(txt)
 
-    with open("test_from_pdf.txt", "w", encoding="utf-8") as f:
+    with open("text_from_pdf.txt", "w", encoding="utf-8") as f:
         f.write("\n".join(text))
 
 
