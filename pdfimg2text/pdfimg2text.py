@@ -27,7 +27,7 @@ def read_text(
         print(f"[+] Found a total of {len(image_li)} images in page {page_index + 1}")
     else:
         print(f"[!] No images found on page {page_index}")
-    for image_index, img in enumerate(page.get_images(), start=1):
+    for image_index, img in enumerate(page.get_images(), start=0):
         # get the XREF of the image
         xref = img[0]
         # extract the image bytes
@@ -51,16 +51,17 @@ def read_text(
         txt = (
             txt
             .strip()
-            .replace("\n", "\t")
+            .replace("\n\n", "\n")
             .replace(" ", "")
         )
-        print(txt)
+        return txt
 
 
 def main(
         command_path: str,
         pdf_path: str,
         page_index: int,
+        last_page_index: int,
         lang: str,
 ):
     # Download Tesseract
@@ -72,7 +73,17 @@ def main(
     # file path you want to extract images from
     pdf_file: mupdf.fitz.Document = mupdf.open(pdf_path)
 
-    read_text(page_index, pdf_file, lang)
+    if last_page_index == 0 or last_page_index < page_index or last_page_index > pdf_file.page_count:
+        last_page_index = page_index
+
+    text: list = []
+    for index in range(page_index, last_page_index + 1):
+        txt = read_text(index, pdf_file, lang)
+        # print(txt)
+        text.append(txt)
+
+    with open("test_from_pdf.txt", "w", encoding="utf-8") as f:
+        f.write("\n".join(text))
 
 
 if __name__ == "__main__":
@@ -103,7 +114,15 @@ if __name__ == "__main__":
         required=False,
         default=0,
         type=int,
-        help='Page Index'
+        help='추출할 페이지'
+    )
+    parser.add_argument(
+        '-t', '--last-index',
+        metavar='<path>',
+        required=False,
+        default=0,
+        type=int,
+        help='여러 페이지 추출 시 마지막 페이지'
     )
     parser.add_argument(
         '-l', '--lang',
@@ -119,5 +138,6 @@ if __name__ == "__main__":
         command_path=args.command_path,
         pdf_path=args.pdf,
         page_index=args.index,
+        last_page_index=args.last_index,
         lang=args.lang,
     )
