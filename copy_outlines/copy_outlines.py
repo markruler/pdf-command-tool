@@ -23,9 +23,11 @@ def _flatten_outlines(
     return ls
 
 
-def main(outline: str,
-         page: str,
-         merge: str):
+def main(
+        outline: str,
+        page: str,
+        merge: str
+):
     # Outline(구 bookmark)을 추출할 PDF
     outline_reader = PdfReader(outline)
     original_outlines: list = outline_reader.outline
@@ -60,13 +62,13 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--outline',
                         metavar='<path>',
                         required=False,
-                        default=r"outline.pdf",
+                        default=r"",
                         type=str,
                         help='Outline(old Bookmark)을 추출할 PDF')
     parser.add_argument('-p', '--page',
                         metavar='<path>',
                         required=False,
-                        default=r"page.pdf",
+                        default=r"",
                         type=str,
                         help='Page를 추출할 PDF')
     parser.add_argument('-m', '--merge',
