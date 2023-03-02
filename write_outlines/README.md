@@ -4,5 +4,5 @@
 
 ```ps1
 # Windows Powershell
-python write_outlines.py -f ..\pdfimg2text\text_from_pdf.txt -p .\page.pdf
+python write_outlines.py -f ..\pdfimg2text\text_from_pdf.txt -p "C:\Users\user\Documents\page.pdf"
 ```

@@ -24,7 +24,7 @@ def read_text(
     # printing number of images found in this page
     # page index starts from 0 hence adding 1 to its content
     if image_li:
-        print(f"[+] Found a total of {len(image_li)} images in page {page_index + 1}")
+        print(f"[+] Found a total of {len(image_li)} images in page {page_index}")
     else:
         print(f"[!] No images found on page {page_index}")
     for image_index, img in enumerate(page.get_images(), start=0):
@@ -128,7 +128,7 @@ if __name__ == "__main__":
         '-l', '--lang',
         metavar='<lang>',
         required=False,
-        default='kor',
+        default='eng+kor',
         type=str,
         help='Language(eng, kor, etc.): "C:\Program Files\Tesseract-OCR\\tessdata\kor.traineddata"'
     )
