@@ -1,6 +1,8 @@
+import asyncio
 import io
 import platform
 import subprocess
+import threading
 import tkinter as tk
 from tkinter import filedialog
 
@@ -64,7 +66,19 @@ def read_text(
         return txt
 
 
-def open_file():
+def _create_thread_for_read(loop):
+    # asyncio.create_task(open_file())
+    thread = threading.Thread(target=_read_until, args=(loop,))
+    # To avoid memory leaks, it is recommended to set a thread as daemon.
+    thread.setDaemon(True)
+    thread.start()
+
+
+def _read_until(async_loop):
+    async_loop.run_until_complete(async_read_file())
+
+
+async def async_read_file():
     # "1.0"부터 "end"까지의 범위를 delete() 메소드의 인자로 전달하여 Text 위젯의 텍스트를 삭제합니다.
     # "1.0"은 첫 번째 라인의 첫 번째 문자를 나타내며, "end"는 마지막 라인의 마지막 문자를 나타냅니다.
     text_widget.delete("1.0", "end")
@@ -88,8 +102,15 @@ def open_file():
     # https://github.com/UB-Mannheim/tesseract/wiki
     pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
+    await read(filename, first_page, last_page)
+
+
+async def read(filename,
+               first_page,
+               last_page):
     # https://stackoverflow.com/questions/20327681/extract-images-from-pdf-using-python-pypdf2
     # file path you want to extract images from
+
     pdf_file: mupdf.fitz.Document = mupdf.open(filename)
 
     for page_index in range(int(first_page), int(last_page) + 1):
@@ -193,16 +214,19 @@ last_page_entry.grid(row=1, column=1)
 message_label = tk.Label(root)
 message_label.grid(row=2, column=0, columnspan=2)
 
+# https://stackoverflow.com/a/47920128/10629432
+loop = asyncio.get_event_loop()
+
 # PDF 파일 열기 버튼
-button = tk.Button(root, text='Open PDF', command=open_file)
+button = tk.Button(root, text='Open PDF', command=lambda: _create_thread_for_read(loop))
 button.grid(row=3, column=0, columnspan=2)
 
 # Undo 버튼
-undo_button = tk.Button(root, text="Undo", command=undo)
+undo_button = tk.Button(root, text="Undo (Ctrl + Y)", command=undo)
 undo_button.grid(row=4, column=0)
 
 # Redo 버튼
-redo_button = tk.Button(root, text="Redo", command=redo)
+redo_button = tk.Button(root, text="Redo (Ctrl + Z)", command=redo)
 redo_button.grid(row=4, column=1)
 
 # Text 위젯 생성
